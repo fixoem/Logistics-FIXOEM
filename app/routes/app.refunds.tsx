@@ -8,9 +8,12 @@ import {
   useBreakpoints,
 } from "@shopify/polaris";
 
+import { useLoaderData, Link, useNavigate } from "@remix-run/react";
+
 
 export default function ProductRefunds() {
 
+  const navigate = useNavigate();
 
   const refund = [
       {
@@ -47,11 +50,11 @@ export default function ProductRefunds() {
               key={index}
               selected={selectedResources.includes(id)}
               position={index}
-              onClick={() => { window.location.href = `/app/refunds/${id}`}}
+              onClick={() => { navigate(`/app/refund/${id}`) }}
               >
                   <IndexTable.Cell>
                       <Text variant="bodyMd" fontWeight="bold" as="span">
-                          {invoice}
+                        {invoice}
                       </Text>    
                   </IndexTable.Cell>
                   <IndexTable.Cell>{date}</IndexTable.Cell>
@@ -74,6 +77,7 @@ export default function ProductRefunds() {
   });
 
   return (
+
       <Page title="Devoluciones" fullWidth={true}>
           <Card padding={'0'}>
               <IndexTable 

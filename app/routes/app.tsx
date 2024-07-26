@@ -16,11 +16,13 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   return json({ apiKey: process.env.SHOPIFY_API_KEY || "" });
 };
 
+
+
 export default function App() {
   const { apiKey } = useLoaderData<typeof loader>();
 
   return (
-    <AppProvider isEmbeddedApp apiKey={apiKey}>
+    <AppProvider i18n={{}} isEmbeddedApp apiKey={apiKey}>
       <NavMenu>
         <Link to="/app" rel="home">
           Home

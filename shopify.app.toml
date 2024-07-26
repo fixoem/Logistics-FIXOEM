@@ -3,7 +3,7 @@
 client_id = "52628660d0cc19535697c8af0fac239e"
 name = "Logistics"
 handle = "logistics-11"
-application_url = "https://tar-chronic-steven-feat.trycloudflare.com"
+application_url = "https://nathan-mistress-investigator-caring.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,9 +17,9 @@ scopes = "write_products"
 
 [auth]
 redirect_urls = [
-  "https://tar-chronic-steven-feat.trycloudflare.com/auth/callback",
-  "https://tar-chronic-steven-feat.trycloudflare.com/auth/shopify/callback",
-  "https://tar-chronic-steven-feat.trycloudflare.com/api/auth/callback"
+  "https://nathan-mistress-investigator-caring.trycloudflare.com/auth/callback",
+  "https://nathan-mistress-investigator-caring.trycloudflare.com/auth/shopify/callback",
+  "https://nathan-mistress-investigator-caring.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]
