@@ -7,42 +7,37 @@ import {
   Text,
   useBreakpoints,
 } from "@shopify/polaris";
-
+import { authenticate } from "../shopify.server";
+import db from "../db.server";
+import { json } from "@remix-run/node";
+import { getDevolutions } from '../models/Devolution.server'
 import { useLoaderData, Link, useNavigate } from "@remix-run/react";
 
+export async function loader({ request }) {
+    const { admin, session } = await authenticate.admin(request);
+    const devolutions = await getDevolutions(admin.graphql);
+
+    return json({
+        devolutions,
+    });
+}
 
 export default function ProductRefunds() {
 
+  const { devolutions } = useLoaderData();
   const navigate = useNavigate();
 
-  const refund = [
-      {
-          id: '1',
-          invoice: '123456',
-          date: '2021-10-10',
-          order: '123456',
-          ticket: '123456',
-          subsidiary: <Badge tone={"success"}>Sucursal 1</Badge>,
-          client: 'Cliente 1',
-          sku: '123456',
-          quantity: 1,
-          reason: 'Razón 1',
-          status: <Badge progress="complete">Terminada</Badge>,
-          creditNote: '123456',
-          observations: 'Observaciones 1'
-      }
-  ]
   const resourceName = {
       singular: 'Devolución',
       plural: 'Devoluciones',
   };
 
-  const {selectedResources, allResourcesSelected, handleSelectionChange} = useIndexResourceState(refund);
+  const {selectedResources, allResourcesSelected, handleSelectionChange} = useIndexResourceState(devolutions);
 
-  const rowMarkup = refund.map( 
+  const rowMarkup = devolutions.map( 
       (
-          {id,invoice,date, order, ticket, subsidiary, client, sku, quantity, reason, status, creditNote, observations}, 
-          index
+          {id,status,mainReason, sucursal, explanation, ticketNumber, clientNumber, orderNumber, createdAt}
+          , index
       ) => {
           return (
               <IndexTable.Row
@@ -54,24 +49,25 @@ export default function ProductRefunds() {
               >
                   <IndexTable.Cell>
                       <Text variant="bodyMd" fontWeight="bold" as="span">
-                        {invoice}
+                        #{id}
                       </Text>    
                   </IndexTable.Cell>
-                  <IndexTable.Cell>{date}</IndexTable.Cell>
-                  <IndexTable.Cell>{order}</IndexTable.Cell>
-                  <IndexTable.Cell>{ticket}</IndexTable.Cell>
-                  <IndexTable.Cell>{subsidiary}</IndexTable.Cell>
-                  <IndexTable.Cell>{client}</IndexTable.Cell>
-                  <IndexTable.Cell>{sku}</IndexTable.Cell>
+                  <IndexTable.Cell>{createdAt}</IndexTable.Cell>
                   <IndexTable.Cell>
-                      <Text as="span" alignment="end">
-                          {quantity}
-                      </Text>
+                    {
+                        status == "Leida" ? <Badge progress={"complete"} tone={"critical"}>{status}</Badge>:
+                        status == "Atendida" ? <Badge progress={"complete"} tone={"attention"}>{status}</Badge>:
+                        status == "En Transito" ? <Badge progress={"complete"} tone={"info"}>{status}</Badge>:
+                        status == "Aceptada" ? <Badge progress={"complete"} tone={"success"}>{status}</Badge>:
+                        status == "Rechazada" ? <Badge progress={"complete"}>{status}</Badge>: ""
+                    }
                   </IndexTable.Cell>
-                  <IndexTable.Cell>{reason}</IndexTable.Cell>
-                  <IndexTable.Cell>{status}</IndexTable.Cell>
-                  <IndexTable.Cell>{creditNote}</IndexTable.Cell>
-                  <IndexTable.Cell>{observations}</IndexTable.Cell>
+                  <IndexTable.Cell>{mainReason}</IndexTable.Cell>
+                  <IndexTable.Cell>{orderNumber}</IndexTable.Cell>
+                  <IndexTable.Cell>{ticketNumber}</IndexTable.Cell>
+                  <IndexTable.Cell>{clientNumber}</IndexTable.Cell>
+                  <IndexTable.Cell>{sucursal}</IndexTable.Cell>
+                
               </IndexTable.Row>
           );
   });
@@ -83,7 +79,7 @@ export default function ProductRefunds() {
               <IndexTable 
               condensed={useBreakpoints().mdOnly}
               resourceName={resourceName}
-              itemCount={refund.length}
+              itemCount={devolutions.length}
               selectedItemsCount={
                 allResourcesSelected ? 'All' : selectedResources.length
               }
@@ -91,16 +87,12 @@ export default function ProductRefunds() {
               headings={[
                   {title:'Folio'},
                   {title:'Fecha'},
+                  {title:'Estatus'},
+                  {title:'Motivo'},
                   {title:'Pedido'},
                   {title:'Ticket'},
-                  {title:'Sucursal'},
                   {title:'Cliente'},
-                  {title:'SKU'},
-                  {title:'Cantidad'},
-                  {title:'Motivo'},
-                  {title:'Estatus'},
-                  {title:'Nota de credito'}, 
-                  {title:'Observaciones'}
+                  {title:'Sucursal'}
               ]}
               pagination={{
                   hasNext: true,

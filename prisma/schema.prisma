@@ -30,3 +30,47 @@ model Session {
   collaborator  Boolean?  @default(false)
   emailVerified Boolean?  @default(false)
 }
+
+model Devolution{
+  id           Int      @id @default(autoincrement())
+  status       String
+  mainReason   String
+  sucursal     String
+  explanation  String
+  ticketNumber Int
+  clientNumber Int
+  orderNumber  Int
+  items        DevolutionItem[]
+  images       DevolutionImage[]
+  createdAt    DateTime @default(now())
+  resolution   Resolution?
+}
+
+model DevolutionItem{
+  id           Int      @id @default(autoincrement())
+  devolution Devolution @relation(fields: [devolutionId], references: [id])
+  devolutionId Int
+  sku          String
+  quantity     Int
+}
+
+model DevolutionImage{
+  id           Int      @id @default(autoincrement())
+  devolution   Devolution @relation(fields: [devolutionId], references: [id])
+  devolutionId Int
+}
+
+model Resolution{
+  id           Int      @id @default(autoincrement())
+  comentarios  String
+  ndc          Int
+  devolution   Devolution @relation(fields: [devolutionId], references: [id])
+  devolutionId Int @unique
+  images       ResolutionImage[]
+}
+
+model ResolutionImage{
+  id           Int        @id @default(autoincrement())
+  resolution   Resolution @relation(fields: [resolutionId], references: [id])
+  resolutionId Int
+}
