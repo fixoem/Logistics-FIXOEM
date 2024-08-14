@@ -55,7 +55,6 @@ export default function ProductRefunds() {
                   <IndexTable.Cell>{createdAt}</IndexTable.Cell>
                   <IndexTable.Cell>
                     {
-                        status == "Leida" ? <Badge progress={"complete"} tone={"critical"}>{status}</Badge>:
                         status == "Atendida" ? <Badge progress={"complete"} tone={"attention"}>{status}</Badge>:
                         status == "En Transito" ? <Badge progress={"complete"} tone={"info"}>{status}</Badge>:
                         status == "Aceptada" ? <Badge progress={"complete"} tone={"success"}>{status}</Badge>:
@@ -74,7 +73,7 @@ export default function ProductRefunds() {
 
   return (
 
-      <Page title="Devoluciones" fullWidth={true}>
+      <Page title="Devoluciones">
           <Card padding={'0'}>
               <IndexTable 
               condensed={useBreakpoints().mdOnly}

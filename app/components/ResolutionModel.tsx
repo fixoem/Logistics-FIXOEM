@@ -2,11 +2,17 @@ import React from "react";
 import { Modal, TextField, Box, DropZone, Thumbnail, Button, InlineStack, Text, Banner, List, Divider, RadioButton } from "@shopify/polaris";
 import { useState, useCallback } from "react";
 
-function ResolutionModal() {
+/**
+ * Limpiar datos cuando se cancela
+ * Enviar datos a la bd cuando se guarda
+ * Obtener datos de la bd y mostrar datos si existen
+*/
 
-    const [isAccepted , setIsAccepted] = React.useState<boolean>(true);
+function ResolutionModal({ show, toggleModal }) {
+
+    const [option , setOption] = React.useState('denied');
     const handleChange = useCallback(
-        (_: boolean, newValue: boolean) => setIsAccepted(newValue),
+        (_: boolean, newValue: string) => {setOption(newValue); console.log(newValue)},
         []
     );
 
@@ -62,19 +68,21 @@ function ResolutionModal() {
 
     return(
         <Modal
-            open={}
-            onClose={}
-            title="Cargar imagenes"
+            open={show}
+            onClose={toggleModal}
+            title="Resolucion"
             primaryAction={{
                 content: "Submit",
                 onAction: () => {
-                
+                    
                 },
             }}
             secondaryActions={[
                 {
                 content: "Cancel",
-                onAction: () => {  },
+                onAction: () => { 
+                    toggleModal()
+                },
                 },
             ]}
             >
@@ -82,18 +90,17 @@ function ResolutionModal() {
             <Modal.Section>
                 <Box padding={'400'}>
        
-                    <Box>
+                    <Box borderStartEndRadius={'200'}>
                         <Box>
                             <RadioButton
-                                label="Subir etiqueta de devolucion"
-                                helpText="Sube la etiqueta de devolucion para que el cliente pueda enviar el producto"
-                                checked={optionValue === 'shipping'}
-                                id="shipping"
-                                name="Shipping Label"
-                                onChange={handleChange}
+                                label="Aceptar Devolución"
+                                checked={option === 'accept'}
+                                id="acceptDevolution"
+                                name="Accept Label"
+                                onChange={() => handleChange(true, "accept")}
                             />
 
-                            { isAccepted && (
+                            { option == 'accept' && (
                                 <TextField
                                     label="Nota de Credito"
                                     value={creditNoteText}
@@ -107,22 +114,21 @@ function ResolutionModal() {
 
                     <Divider/>
 
-                    <Box padding={'400'}>    
+                    <Box borderStartEndRadius={'200'}>    
                         <Box>
                             <RadioButton
-                                label="No se requiere envio"
-                                helpText="La entrega del producto se hara en sucursal"
-                                checked={optionValue === 'noShipping'}
-                                id="noShipping"
-                                name="Shipping Label"
-                                onChange={handleChange}
+                                label="Rechazar Devolución"
+                                checked={option === 'denied'}
+                                id="deniedDevolution"
+                                name="Denied Label"
+                                onChange={() => handleChange(true, "denied")}
                             />
                         </Box>  
                     </Box>
 
                     
 
-                    { !isAccepted && (
+                    { option == 'denied' && (
                         <>
                             <TextField
                                 label="Comentarios"

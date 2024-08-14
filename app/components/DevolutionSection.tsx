@@ -1,9 +1,21 @@
 import React from 'react';
-import {Box, Card, Text, Divider, RadioButton, BlockStack, DropZone, Thumbnail, InlineStack} from '@shopify/polaris';
+import {Box, Card, Text, Divider, RadioButton, BlockStack, DropZone, Thumbnail, InlineStack, Checkbox } from '@shopify/polaris';
 import {NoteIcon} from '@shopify/polaris-icons';
 import { useState, useCallback } from 'react';
 
-function DevolutionSection() {
+/**
+ * Enviar datos a la bd cuando se guarda
+ * Obtener datos de la bd y mostrar datos si existen
+*/
+
+function DevolutionSection({isPaymentDone}) {
+
+  // Shippment Label Payment
+  const [ paymentShipping, setPaymentShipping ] = useState<boolean>(isPaymentDone);
+  const handlePaymentShipping = useCallback(
+      (newChecked: boolean) => setPaymentShipping(newChecked),
+      [],
+  );
 
   const [optionValue , setOptionValue] = React.useState('shipping');
   const handleChange = useCallback(
@@ -47,10 +59,17 @@ function DevolutionSection() {
         <Text as="h1" variant={'headingMd'}>
             Opciones de devolucion de envios
         </Text>
+        <Checkbox
+          label="Guia Pagada"
+          checked={paymentShipping}
+          onChange={handlePaymentShipping}
+        />
       </Box>
 
       <Divider/>
-        
+      
+      { paymentShipping && (
+
       <Box padding={'400'}>    
             <Box>
               <RadioButton
@@ -73,6 +92,7 @@ function DevolutionSection() {
               
             </Box>  
       </Box>
+      )}
 
       <Divider/>
 

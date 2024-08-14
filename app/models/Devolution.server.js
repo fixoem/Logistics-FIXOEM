@@ -2,7 +2,7 @@ import db from "../db.server";
 
 export async function getDevolutions(graphql) {
     const devolutions = await db.devolution.findMany({
-        orderBy: { createdAt: "desc" },
+        orderBy: { createdAt: "desc" }
     });
 
     if (devolutions.length === 0) return [];
@@ -13,7 +13,6 @@ export async function getDevolutions(graphql) {
 
 export async function getDevolutionById(devolutionId, graphql) {
 
-    console.log("ID: ", devolutionId);
     try {
       const devolution = await db.devolution.findUnique({
         where: { id: Number(devolutionId) },

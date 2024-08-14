@@ -1,6 +1,6 @@
 
 import { json } from "@remix-run/node";
-import { useState, useCallback } from 'react';
+import { useState, useCallback, act } from 'react';
 import { useLoaderData } from "@remix-run/react";
 import { Page, Card, TextField, FormLayout, Button, ButtonGroup, Badge, Grid, Text, DataTable, Divider, Thumbnail, Modal, Select, Layout, Box, DropZone, InlineStack, InlineGrid, Banner, List } from "@shopify/polaris";
 
@@ -10,7 +10,15 @@ import { getDevolutionById } from '../models/Devolution.server';
 import DevolutionSection from '../components/DevolutionSection';
 import ResolutionModal from "../components/ResolutionModel";
 import Order from '../components/Order';
+import EvidenceModal from "../components/EvidenceModal";
+import SaveIndoModal from "../components/SaveInfoModal";
 
+
+/**
+ * Actualizar datos cuando de clic en guarda
+ * Obtener la info del producto de bd y mostrarla
+ * Funcion para subir imagenes y obtener la url para guardarla en bd
+ * */
 
 export async function loader({ request, params }) {
 
@@ -28,21 +36,43 @@ export default function Refund() {
 
     const { devolution } = useLoaderData();
 
-    // Inputs Management
-    const [text, setText] = useState("");
     
     // Modal Show Image
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const handleImageClick = (src: string) => {
         setSelectedImage(src);
     };
-    
     const handleCloseModal = () => {
         setSelectedImage(null);
     };
 
+    // Show Resolution Modal
+    const [ modalResolution, setModalResolution] = useState<boolean>(false);
+    const handlerModalResolution = () => setModalResolution(!modalResolution);
     
+    // Show Modal to Save Info
+    const [ saveModal, setSaveModal ] = useState<boolean>(false);
+    const handlerSaveModal = useCallback(() => setSaveModal( (saveModal) => !saveModal ), []);
 
+    // Evidence Images Map List
+    const evidenceImages = devolution.images.map( ( item ) => {
+        return(
+            <Grid.Cell columnSpan={{ md: 1, lg: 1, xl: 1 }}>
+
+                <div style={{ textAlign: 'center' }}>
+                    <img 
+                        onClick={() => { handleImageClick(`${item.image}`) }}
+                        style={{ cursor: 'pointer', maxWidth: '100%', height: 'auto' }}
+                        src={item.image}
+                        alt={item.image}
+                    />
+                </div>
+                
+            </Grid.Cell>
+        )
+    });
+
+    // Articles Map List
     const handleArticles = devolution.items.map( (item) => {
         return (
             <>
@@ -75,21 +105,21 @@ export default function Refund() {
         
     };
 
-
+    // State of the invoice 
     const [stateSelected, setSelected] = useState(devolution.status); // From DB
     const handleStateSelected = useCallback(
         (value: string) => setSelected(value),
         [],
     );
     const stateOptions = [
-        {label: 'Leida', value: 'Leida'},
+        {label: 'Devolución Solicitada', value: 'Devolución Solicitada'},
         {label: 'Atendida', value: 'Atendida'},
         {label: 'En Transito', value: 'En Transito'},
-        {label: 'Aceptada', value: 'Acepatada'},
+        {label: 'Aceptada', value: 'Aceptada'},
         {label: 'Rechazada', value: 'Rechazada'},
     ];
 
-
+    // Subsidiary in charge of the invoice
     const [subsidiarySelected, setSubsidiarySelected] = useState(devolution.sucursal); // From DB
     const subsidiaryOptions = [
         {label: 'CEDIS', value: 'CEDIS'},
@@ -102,6 +132,7 @@ export default function Refund() {
         (value: string) => setSubsidiarySelected(value),
         [],
     );
+    
 
     return (
     <Page 
@@ -110,42 +141,43 @@ export default function Refund() {
         compactTitle
         titleMetadata={
             <>
-                {devolution.status == "Leida" ? (
-                    <Badge progress="complete" tone="critical">{devolution.status}</Badge>
-                ) : devolution.status == "Atendida" ? (
-                    <Badge progress="complete" tone="attention">{devolution.status}</Badge>
-                ) : devolution.status == "En Transito" ? (
-                    <Badge progress="complete" tone="info">{devolution.status}</Badge>
-                ) : devolution.status == "Aceptada" ? (
-                    <Badge progress="complete" tone="success">{devolution.status}</Badge>
-                ) : devolution.status == "Rechazada" ? (
-                    <Badge progress="complete">{devolution.status}</Badge>
+                {stateSelected == "Devolución Solicitada" ? (
+                    <Badge progress="complete" tone="critical">{stateSelected}</Badge>
+                ) :stateSelected == "Atendida" ? (
+                    <Badge progress="complete" tone="attention">{stateSelected}</Badge>
+                ) : stateSelected == "En Transito" ? (
+                    <Badge progress="complete" tone="info">{stateSelected}</Badge>
+                ) : stateSelected == "Aceptada" ? (
+                    <Badge progress="complete" tone="success">{stateSelected}</Badge>
+                ) : stateSelected == "Rechazada" ? (
+                    <Badge progress="complete">{stateSelected}</Badge>
                 ) : null}
-                <Badge>{devolution.sucursal}</Badge>
+                <Badge>{subsidiarySelected}</Badge>
                 <Badge>{devolution.mainReason}</Badge>
             </>
         }
         subtitle={formatDate(devolution.createdAt)}
         primaryAction={
-            <Button variant="primary">Resolución</Button>
+            <Button variant="primary" onClick={handlerSaveModal}>Guardar</Button>
+        }
+        secondaryActions={
+            <Button onClick={handlerModalResolution}>Resolución</Button>
         }
         >
-
-
             <Layout>
                 <Layout.Section>
                     <Card>
 
-                        {devolution.status == "Leida" ? (
-                            <Badge progress="complete" tone="critical">{devolution.status}</Badge>
-                        ) : devolution.status == "Atendida" ? (
-                            <Badge progress="complete" tone="attention">{devolution.status}</Badge>
-                        ) : devolution.status == "En Transito" ? (
-                            <Badge progress="complete" tone="info">{devolution.status}</Badge>
-                        ) : devolution.status == "Aceptada" ? (
-                            <Badge progress="complete" tone="success">{devolution.status}</Badge>
-                        ) : devolution.status == "Rechazada" ? (
-                            <Badge progress="complete">{devolution.status}</Badge>
+                        {stateSelected == "Devolución Solicitada" ? (
+                            <Badge progress="complete" tone="critical">{stateSelected}</Badge>
+                        ) : stateSelected == "Atendida" ? (
+                            <Badge progress="complete" tone="attention">{stateSelected}</Badge>
+                        ) : stateSelected == "En Transito" ? (
+                            <Badge progress="complete" tone="info">{stateSelected}</Badge>
+                        ) : stateSelected == "Aceptada" ? (
+                            <Badge progress="complete" tone="success">{stateSelected}</Badge>
+                        ) : stateSelected == "Rechazada" ? (
+                            <Badge progress="complete">{stateSelected}</Badge>
                         ) : null}
 
                         <Divider borderColor="transparent" borderWidth={'100'}/> 
@@ -163,7 +195,7 @@ export default function Refund() {
                                         Fecha en que el cliente recibió el producto
                                     </Text>
                                     <Text as="p" variant="bodySm">
-                                        {devolution.createdAt}
+                                        {devolution.dateProductArrive}
                                     </Text>
                                 </Box>
 
@@ -212,18 +244,7 @@ export default function Refund() {
 
                                 <Box paddingBlock="200">
                                     <Grid columns={{md: 2, lg: 2, xl: 2}}>
-                                        <Grid.Cell columnSpan={{ md: 1, lg: 1, xl: 1 }}>
-
-                                            <div style={{ textAlign: 'center' }}>
-                                                {/* <img 
-                                                    onClick={() => { handleImageClick("https://via.placeholder.com/150") }}
-                                                    style={{ cursor: 'pointer', maxWidth: '100%', height: 'auto' }}
-                                                    src="https://via.placeholder.com/150" 
-                                                    alt="Evidencia 1" 
-                                                /> */}
-                                            </div>
-                                            
-                                        </Grid.Cell>                                
+                                        {evidenceImages}                               
                                     </Grid>
                                 </Box>
                             
@@ -245,7 +266,7 @@ export default function Refund() {
                     <Divider borderColor="transparent" borderWidth={'100'}/> 
                     <Divider borderColor="transparent" borderWidth={'100'}/> 
 
-                    <DevolutionSection />
+                    <DevolutionSection isPaymentDone={devolution.shippingPayment} />
 
                 </Layout.Section>
 
@@ -255,6 +276,7 @@ export default function Refund() {
                         ticketNumber={devolution.ticketNumber}
                         orderNumber={devolution.orderNumber}
                         clientNumber={devolution.clientNumber}
+                        clientPhone={devolution.clientPhone ? devolution.clientPhone : 8989898989}
                         />
 
                     <Divider borderColor="transparent" borderWidth={'100'}/>
@@ -263,7 +285,6 @@ export default function Refund() {
 
                     <Card >
                         <FormLayout>
-                            
                             <Select
                                 label="Estado"
                                 options={stateOptions}
@@ -282,21 +303,13 @@ export default function Refund() {
                 </Layout.Section>
             </Layout>
             
-            {selectedImage && (
-                <Modal
-                open={true}
-                onClose={handleCloseModal}
-                title="Vista de Evidencia"
-                primaryAction={{
-                    content: 'Cerrar',
-                    onAction: handleCloseModal,
-                }}
-                >
-                    <Modal.Section>
-                        <img src={selectedImage} alt="Evidencia Grande" style={{ width: '100%' }} />
-                    </Modal.Section>
-                </Modal>
-            )}
+            
+            <EvidenceModal show={selectedImage} closeModal={handleCloseModal} source={selectedImage}/>
+            
+
+            <ResolutionModal show={modalResolution} toggleModal={handlerModalResolution} />
+
+            <SaveIndoModal show={saveModal} toggleModal={setSaveModal} />
 
     </Page>
     );
