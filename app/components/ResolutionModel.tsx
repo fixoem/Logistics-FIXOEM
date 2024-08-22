@@ -8,62 +8,43 @@ import { useState, useCallback } from "react";
  * Obtener datos de la bd y mostrar datos si existen
 */
 
-function ResolutionModal({ show, toggleModal }) {
+function ResolutionModal({ 
+    show, 
+    toggleModal, 
+    saveInfo,
+    resolution,
+    creditNote,
+    commentaries,
+    resolutionHandler,
+    creditNoteHandler,
+    commentariesHandler,
+    files,
+    dropZoneHandler,
+    messageError
 
-    const [option , setOption] = React.useState('denied');
-    const handleChange = useCallback(
-        (_: boolean, newValue: string) => {setOption(newValue); console.log(newValue)},
-        []
-    );
+}) {
 
-    const [creditNoteText, setCreditNoteText] = useState<string>("");
-    const handleCreditNoteText = useCallback((value : string) => setCreditNoteText(value), []);
-
-    const [commentariesText, setCommentariesText] = useState<string>("")
-    const handleCommentariesText = useCallback((value : string) => setCommentariesText(value), []);
-
-    const [files, setFiles] = useState<File[]>([]);
-    const [rejectedFiles, setRejectedFiles] = useState<File[]>([]);
-    const hasError = rejectedFiles.length > 0;
-
-    const handleDropZoneDrop = useCallback(
-        (_droppedFiles: File[], acceptedFiles: File[], rejectedFiles: File[]) => {
-          setFiles((files) => [...files, ...acceptedFiles]);
-          setRejectedFiles(rejectedFiles);
-        },
-        [],
-    );
-
-    const fileUpload = !files.length && <DropZone.FileUpload actionTitle="Cargar Imagenes" actionHint="Accepts .gif, .jpg, and .png" />;
+    const fileUpload = !files.length && <DropZone.FileUpload actionTitle="Cargar Imagenes" actionHint="Accepts .jpg, and .png" />;
     const uploadedFiles = files.length > 0 && (
-        <InlineStack>
-        {files.map((file, index) => (
-            <InlineStack key={index}>
-            <Thumbnail
-                size="small"
-                alt={file.name}
-                source={window.URL.createObjectURL(file)}
-            />
-            <div>
-                {file.name}{' '}
-                <Text variant="bodySm" as="p">
-                {file.size} bytes
-                </Text>
-            </div>
-            </InlineStack>
-        ))}
-        </InlineStack>
-    );
-    const errorMessage = hasError && (
-        <Banner title="The following images couldn’t be uploaded:" tone="critical">
-          <List type="bullet">
-            {rejectedFiles.map((file, index) => (
-              <List.Item key={index}>
-                {`"${file.name}" is not supported. File type must be .jpg, .png.`}
-              </List.Item>
+        <div style={{display: 'grid', width: '100%', height: '100%', placeContent: 'center'}}>
+            <InlineStack>
+            {files.map((file, index) => (
+                <InlineStack key={index}>
+                <Thumbnail
+                    size="small"
+                    alt={file.name}
+                    source={window.URL.createObjectURL(file)}
+                />
+                <div>
+                    {file.name}{' '}
+                    <Text variant="bodySm" as="p">
+                    {file.size} bytes
+                    </Text>
+                </div>
+                </InlineStack>
             ))}
-          </List>
-        </Banner>
+            </InlineStack>
+        </div>
     );
 
     return(
@@ -74,7 +55,7 @@ function ResolutionModal({ show, toggleModal }) {
             primaryAction={{
                 content: "Submit",
                 onAction: () => {
-                    
+                    saveInfo()
                 },
             }}
             secondaryActions={[
@@ -94,17 +75,17 @@ function ResolutionModal({ show, toggleModal }) {
                         <Box>
                             <RadioButton
                                 label="Aceptar Devolución"
-                                checked={option === 'accept'}
+                                checked={resolution === 'accept'}
                                 id="acceptDevolution"
                                 name="Accept Label"
-                                onChange={() => handleChange(true, "accept")}
+                                onChange={() => resolutionHandler(true, "accept")}
                             />
 
-                            { option == 'accept' && (
+                            { resolution == 'accept' && (
                                 <TextField
                                     label="Nota de Credito"
-                                    value={creditNoteText}
-                                    onChange={handleCreditNoteText}
+                                    value={creditNote}
+                                    onChange={creditNoteHandler}
                                     autoComplete="off"
                                 />
                             )}
@@ -118,29 +99,29 @@ function ResolutionModal({ show, toggleModal }) {
                         <Box>
                             <RadioButton
                                 label="Rechazar Devolución"
-                                checked={option === 'denied'}
+                                checked={resolution === 'denied'}
                                 id="deniedDevolution"
                                 name="Denied Label"
-                                onChange={() => handleChange(true, "denied")}
+                                onChange={() => resolutionHandler(true, "denied")}
                             />
                         </Box>  
                     </Box>
 
                     
 
-                    { option == 'denied' && (
+                    { resolution == 'denied' && (
                         <>
                             <TextField
                                 label="Comentarios"
-                                value={commentariesText}
+                                value={commentaries}
                                 multiline={6}
-                                onChange={handleCommentariesText}
+                                onChange={commentariesHandler}
                                 autoComplete="off"
                             />
 
                             <Box>
-                                {errorMessage}
-                                <DropZone label="Imagenes" accept="image/*" type="image" onDrop={handleDropZoneDrop}>
+                                {messageError}
+                                <DropZone label="Imagenes" accept="image/*" type="image" onDrop={dropZoneHandler}>
                                     {uploadedFiles}
                                     {fileUpload}
                                 </DropZone>

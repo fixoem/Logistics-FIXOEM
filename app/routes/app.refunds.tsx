@@ -10,8 +10,9 @@ import {
 import { authenticate } from "../shopify.server";
 import db from "../db.server";
 import { json } from "@remix-run/node";
-import { getDevolutions } from '../models/Devolution.server'
+import { getDevolutions } from '../server/Devolution.server'
 import { useLoaderData, Link, useNavigate } from "@remix-run/react";
+
 
 export async function loader({ request }) {
     const { admin, session } = await authenticate.admin(request);

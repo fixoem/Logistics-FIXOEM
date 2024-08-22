@@ -8,48 +8,36 @@ import { useState, useCallback } from 'react';
  * Obtener datos de la bd y mostrar datos si existen
 */
 
-function DevolutionSection({isPaymentDone}) {
+function DevolutionSection({
 
-  // Shippment Label Payment
-  const [ paymentShipping, setPaymentShipping ] = useState<boolean>(isPaymentDone);
-  const handlePaymentShipping = useCallback(
-      (newChecked: boolean) => setPaymentShipping(newChecked),
-      [],
-  );
+  isPaymentDone, 
+  onPaymentChange, 
+  optionValue, 
+  onOptionChange, 
+  onFileDrop, 
+  file
 
-  const [optionValue , setOptionValue] = React.useState('shipping');
-  const handleChange = useCallback(
-    (_: boolean, newValue: string) => setOptionValue(newValue),
-    []
-  );
+}) {
 
-  // File management
-  const validImageTypes = ['application/pdf'];
-  const [file, setFile] = useState<File>();
-  const handleDropZoneDrop = useCallback(
-    (_dropFiles: File[], acceptedFiles: File[], _rejectedFiles: File[]) =>
-      setFile(acceptedFiles[0]),
-    [],
-  );
-  const fileUpload = !file && <DropZone.FileUpload actionTitle='Subir guía' actionHint='Solo se admiten archivos .pdf'/>;
-  const uploadedFile = file && (
-    <div style={{display: 'grid', width: '100%', height: '100%', placeContent: 'center'}}>
-        <InlineStack>
-        <Thumbnail
-          size="small"
-          alt={file.name}
-          source={ NoteIcon }
-        />
-        
-        <div>
-          {file.name} 
-          <Text variant="bodySm" as="p">
-            {file.size} bytes
-          </Text>
-        </div>
+  const fileUploadShipping = !file && <DropZone.FileUpload actionTitle='Subir guía' actionHint='Solo se admiten archivos .pdf'/>;
+  const uploadedFileShipping = file && (
+      <div style={{display: 'grid', width: '100%', height: '100%', placeContent: 'center'}}>
+          <InlineStack>
+            <Thumbnail
+            size="small"
+            alt={file.name}
+            source={ NoteIcon }
+            />
+            
+            <div>
+            {file.name} 
+            <Text variant="bodySm" as="p">
+                {file.size} bytes
+            </Text>
+          </div>
       
       </InlineStack>
-    </div>
+      </div>
   )
 
   return (
@@ -61,14 +49,14 @@ function DevolutionSection({isPaymentDone}) {
         </Text>
         <Checkbox
           label="Guia Pagada"
-          checked={paymentShipping}
-          onChange={handlePaymentShipping}
+          checked={isPaymentDone}
+          onChange={onPaymentChange}
         />
       </Box>
 
       <Divider/>
       
-      { paymentShipping && (
+      { isPaymentDone && (
 
       <Box padding={'400'}>    
             <Box>
@@ -78,14 +66,14 @@ function DevolutionSection({isPaymentDone}) {
                 checked={optionValue === 'shipping'}
                 id="shipping"
                 name="Shipping Label"
-                onChange={handleChange}
+                onChange={onOptionChange}
               />
 
               { optionValue === 'shipping' && (
                 <Box paddingBlockStart={'400'}>
-                  <DropZone allowMultiple={false} onDrop={handleDropZoneDrop}>
-                    {uploadedFile}
-                    {fileUpload}
+                  <DropZone accept='application/pdf' errorOverlayText="File type must be .pdf" allowMultiple={false} onDrop={onFileDrop}>
+                    {uploadedFileShipping}
+                    {fileUploadShipping}
                   </DropZone>
                 </Box>
               )}
@@ -104,7 +92,7 @@ function DevolutionSection({isPaymentDone}) {
                 checked={optionValue === 'noShipping'}
                 id="noShipping"
                 name="Shipping Label"
-                onChange={handleChange}
+                onChange={onOptionChange}
               />
             </Box>  
       </Box>

@@ -47,6 +47,7 @@ model Devolution{
   returnmentLabel   String
   dateProductArrive DateTime
   shippingPayment   Boolean @default(false)
+  requiresLabel     Boolean @default(false)
 }
 
 model DevolutionItem{
@@ -67,7 +68,7 @@ model DevolutionImage{
 model Resolution{
   id           Int      @id @default(autoincrement())
   comentarios  String
-  ndc          Int
+  ndc          String
   devolution   Devolution @relation(fields: [devolutionId], references: [id])
   devolutionId Int @unique
   images       ResolutionImage[]

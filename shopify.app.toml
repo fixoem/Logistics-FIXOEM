@@ -3,7 +3,7 @@
 client_id = "52628660d0cc19535697c8af0fac239e"
 name = "Logistics"
 handle = "logistics-11"
-application_url = "https://metabolism-bars-proceeds-retirement.trycloudflare.com"
+application_url = "https://disclaimers-roommate-battery-lifetime.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,9 +17,9 @@ scopes = "write_products"
 
 [auth]
 redirect_urls = [
-  "https://metabolism-bars-proceeds-retirement.trycloudflare.com/auth/callback",
-  "https://metabolism-bars-proceeds-retirement.trycloudflare.com/auth/shopify/callback",
-  "https://metabolism-bars-proceeds-retirement.trycloudflare.com/api/auth/callback"
+  "https://disclaimers-roommate-battery-lifetime.trycloudflare.com/auth/callback",
+  "https://disclaimers-roommate-battery-lifetime.trycloudflare.com/auth/shopify/callback",
+  "https://disclaimers-roommate-battery-lifetime.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]
